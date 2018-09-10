@@ -22,22 +22,46 @@ android {
     }
 }
 
-//删除旧的jar的Task：deleteOldJar 名字随便写
-task deleteOldJar(type: Delete) {
-    delete 'build/outputs/myJar.jar'
+this.project.afterEvaluate {
+    def buildTask = this.project.tasks.getByName('createFullJarRelease')
+    if (buildTask == null) throw GradleException
+
+    buildTask.doLast {
+        mkJar.execute()
+    }
+}
+task mkJar {
+    doLast {
+        if (rootProject.file('app/libs/myJar1.jar').exists()) {
+            println('删除旧包')
+            rootProject.file('app/libs/htsec_RealTrade.jar').delete()
+        }
+        copy {
+            from('build/intermediates/intermediate-jars/release/')
+            into(rootProject.file('app/libs/'))
+            include('classes.jar')
+            rename('classes.jar', 'myJar1.jar')
+        }
+    }
 }
 
-//导出新的jar，exportJar也可是别的名字
+
+
+//删除旧的jar的Task：deleteOldJar 名字随便写
+task deleteOldJar(type: Delete) {
+    delete 'build/outputs/myJar2.jar'
+}
+
 task exportJar(type: Copy) {
-    if (rootProject.file('app/libs/myJar.jar').exists()) {
+    if (rootProject.file('app/libs/myJar2.jar').exists()) {
         println('先删除了')
-        rootProject.file('app/libs/myJar.jar').delete()
+        rootProject.file('app/libs/myJar2.jar').delete()
     }
 
     from('build/intermediates/intermediate-jars/release/')
     into(rootProject.file('app/libs/'))
     include('classes.jar')
-    rename('classes.jar', 'myJar.jar')
+    rename('classes.jar', 'myJar2.jar')
 
 }
 
