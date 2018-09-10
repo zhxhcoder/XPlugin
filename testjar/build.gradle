@@ -17,6 +17,9 @@ android {
         }
     }
 
+    lintOptions{
+        abortOnError false
+    }
 }
 
 //删除旧的jar的Task：deleteOldJar 名字随便写
